@@ -14,6 +14,8 @@
 		421CF4871B84208B0094A0C8 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 421CF4861B84208B0094A0C8 /* Images.xcassets */; };
 		421CF48A1B84208B0094A0C8 /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 421CF4881B84208B0094A0C8 /* LaunchScreen.xib */; };
 		421CF4961B84208B0094A0C8 /* RDownloaderTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 421CF4951B84208B0094A0C8 /* RDownloaderTests.m */; };
+		4242853E1B9EB8AC00F292AC /* RDownloader.m in Sources */ = {isa = PBXBuildFile; fileRef = 4242853D1B9EB8AC00F292AC /* RDownloader.m */; };
+		424285411B9EBAA700F292AC /* RDownloadTask.m in Sources */ = {isa = PBXBuildFile; fileRef = 424285401B9EBAA700F292AC /* RDownloadTask.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -40,6 +42,10 @@
 		421CF48F1B84208B0094A0C8 /* RDownloaderTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = RDownloaderTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		421CF4941B84208B0094A0C8 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		421CF4951B84208B0094A0C8 /* RDownloaderTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = RDownloaderTests.m; sourceTree = "<group>"; };
+		4242853C1B9EB8AC00F292AC /* RDownloader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RDownloader.h; sourceTree = "<group>"; };
+		4242853D1B9EB8AC00F292AC /* RDownloader.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RDownloader.m; sourceTree = "<group>"; };
+		4242853F1B9EBAA700F292AC /* RDownloadTask.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RDownloadTask.h; sourceTree = "<group>"; };
+		424285401B9EBAA700F292AC /* RDownloadTask.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RDownloadTask.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -88,6 +94,7 @@
 				421CF4831B84208B0094A0C8 /* Main.storyboard */,
 				421CF4861B84208B0094A0C8 /* Images.xcassets */,
 				421CF4881B84208B0094A0C8 /* LaunchScreen.xib */,
+				4242853B1B9E8B3600F292AC /* RDownloader */,
 				421CF4791B84208B0094A0C8 /* Supporting Files */,
 			);
 			path = RDownloader;
@@ -117,6 +124,17 @@
 				421CF4941B84208B0094A0C8 /* Info.plist */,
 			);
 			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		4242853B1B9E8B3600F292AC /* RDownloader */ = {
+			isa = PBXGroup;
+			children = (
+				4242853F1B9EBAA700F292AC /* RDownloadTask.h */,
+				424285401B9EBAA700F292AC /* RDownloadTask.m */,
+				4242853C1B9EB8AC00F292AC /* RDownloader.h */,
+				4242853D1B9EB8AC00F292AC /* RDownloader.m */,
+			);
+			path = RDownloader;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -220,8 +238,10 @@
 			buildActionMask = 2147483647;
 			files = (
 				421CF4821B84208B0094A0C8 /* ViewController.m in Sources */,
+				4242853E1B9EB8AC00F292AC /* RDownloader.m in Sources */,
 				421CF47F1B84208B0094A0C8 /* AppDelegate.m in Sources */,
 				421CF47C1B84208B0094A0C8 /* main.m in Sources */,
+				424285411B9EBAA700F292AC /* RDownloadTask.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -350,6 +370,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				INFOPLIST_FILE = RDownloader/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
@@ -360,6 +381,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				INFOPLIST_FILE = RDownloader/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
@@ -418,6 +440,7 @@
 				421CF49B1B84208B0094A0C8 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		421CF49C1B84208B0094A0C8 /* Build configuration list for PBXNativeTarget "RDownloaderTests" */ = {
 			isa = XCConfigurationList;
@@ -426,6 +449,7 @@
 				421CF49E1B84208B0094A0C8 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
