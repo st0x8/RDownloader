@@ -16,6 +16,9 @@
 		421CF4961B84208B0094A0C8 /* RDownloaderTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 421CF4951B84208B0094A0C8 /* RDownloaderTests.m */; };
 		4242853E1B9EB8AC00F292AC /* RDownloader.m in Sources */ = {isa = PBXBuildFile; fileRef = 4242853D1B9EB8AC00F292AC /* RDownloader.m */; };
 		424285411B9EBAA700F292AC /* RDownloadTask.m in Sources */ = {isa = PBXBuildFile; fileRef = 424285401B9EBAA700F292AC /* RDownloadTask.m */; };
+		428D45461BABEF6300386682 /* AFNetworkReachabilityManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 428D45451BABEF6300386682 /* AFNetworkReachabilityManager.m */; };
+		428D45481BAC056800386682 /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 428D45471BAC056800386682 /* SystemConfiguration.framework */; };
+		429E6C7A1BA2DDEE00BB861B /* ProgressTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 429E6C781BA2DDEE00BB861B /* ProgressTableViewCell.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -46,6 +49,11 @@
 		4242853D1B9EB8AC00F292AC /* RDownloader.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RDownloader.m; sourceTree = "<group>"; };
 		4242853F1B9EBAA700F292AC /* RDownloadTask.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RDownloadTask.h; sourceTree = "<group>"; };
 		424285401B9EBAA700F292AC /* RDownloadTask.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RDownloadTask.m; sourceTree = "<group>"; };
+		428D45441BABEF6300386682 /* AFNetworkReachabilityManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AFNetworkReachabilityManager.h; sourceTree = "<group>"; };
+		428D45451BABEF6300386682 /* AFNetworkReachabilityManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AFNetworkReachabilityManager.m; sourceTree = "<group>"; };
+		428D45471BAC056800386682 /* SystemConfiguration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = System/Library/Frameworks/SystemConfiguration.framework; sourceTree = SDKROOT; };
+		429E6C771BA2DDEE00BB861B /* ProgressTableViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ProgressTableViewCell.h; sourceTree = "<group>"; };
+		429E6C781BA2DDEE00BB861B /* ProgressTableViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ProgressTableViewCell.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -53,6 +61,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				428D45481BAC056800386682 /* SystemConfiguration.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -92,6 +101,8 @@
 				421CF4801B84208B0094A0C8 /* ViewController.h */,
 				421CF4811B84208B0094A0C8 /* ViewController.m */,
 				421CF4831B84208B0094A0C8 /* Main.storyboard */,
+				429E6C771BA2DDEE00BB861B /* ProgressTableViewCell.h */,
+				429E6C781BA2DDEE00BB861B /* ProgressTableViewCell.m */,
 				421CF4861B84208B0094A0C8 /* Images.xcassets */,
 				421CF4881B84208B0094A0C8 /* LaunchScreen.xib */,
 				4242853B1B9E8B3600F292AC /* RDownloader */,
@@ -133,6 +144,9 @@
 				424285401B9EBAA700F292AC /* RDownloadTask.m */,
 				4242853C1B9EB8AC00F292AC /* RDownloader.h */,
 				4242853D1B9EB8AC00F292AC /* RDownloader.m */,
+				428D45441BABEF6300386682 /* AFNetworkReachabilityManager.h */,
+				428D45451BABEF6300386682 /* AFNetworkReachabilityManager.m */,
+				428D45471BAC056800386682 /* SystemConfiguration.framework */,
 			);
 			path = RDownloader;
 			sourceTree = "<group>";
@@ -186,6 +200,11 @@
 				TargetAttributes = {
 					421CF4751B84208B0094A0C8 = {
 						CreatedOnToolsVersion = 6.3;
+						SystemCapabilities = {
+							com.apple.BackgroundModes = {
+								enabled = 1;
+							};
+						};
 					};
 					421CF48E1B84208B0094A0C8 = {
 						CreatedOnToolsVersion = 6.3;
@@ -237,8 +256,10 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				429E6C7A1BA2DDEE00BB861B /* ProgressTableViewCell.m in Sources */,
 				421CF4821B84208B0094A0C8 /* ViewController.m in Sources */,
 				4242853E1B9EB8AC00F292AC /* RDownloader.m in Sources */,
+				428D45461BABEF6300386682 /* AFNetworkReachabilityManager.m in Sources */,
 				421CF47F1B84208B0094A0C8 /* AppDelegate.m in Sources */,
 				421CF47C1B84208B0094A0C8 /* main.m in Sources */,
 				424285411B9EBAA700F292AC /* RDownloadTask.m in Sources */,
