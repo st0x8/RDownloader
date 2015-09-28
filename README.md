@@ -18,7 +18,7 @@ RDownloader is a multiple files asynchronous download manager for iOS based on N
 
 ##Usage
 <p align="center">
-<img style='border:1px solid #ccc;' src="https://github.com/st0x8/RDownloader/raw/master/screenshot.jpg" alt="Running Example" title="Running Example">
+<img style='border:1px solid #ccc;' src="https://github.com/st0x8/RDownloader/raw/master/screenshot.png" alt="Running Example" title="Running Example">
 </p>
 RDownloader provides facilties for the following task:
 
