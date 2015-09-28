@@ -36,6 +36,7 @@
         NSURLSessionConfiguration *config = [NSURLSessionConfiguration backgroundSessionConfigurationWithIdentifier:@"com.st0x8.RDownloader.NSURLSession"];
         downloader.backgroundSession = [NSURLSession sessionWithConfiguration:config delegate:downloader delegateQueue:nil];
         [downloader getOutstandingTaskFromSession];
+        downloader.networkReachable = NO;
         [downloader monitorNetworkStatus];
     });
     return downloader;
@@ -45,6 +46,7 @@
     RDownloadTask *task;
     if (taskInfo[@"URL"]) {
         task = [[RDownloadTask alloc] initWithURL:taskInfo[@"URL"] andFileName:taskInfo[@"fileName"] destinationPath:taskInfo[@"destinationPath"]];
+        task.taskInterrupt = TaskInterruptCreateTask;
     } else {
         [NSException raise:@"RDownloadTaskInitialization" format:@"The URL can not be nil."];
     }
@@ -55,6 +57,7 @@
     RDownloadTask *task;
     if (taskInfo[@"URL"]) {
         task = [[RDownloadTask alloc] initWithURL:taskInfo[@"URL"] andFileName:taskInfo[@"fileName"] destinationPath:taskInfo[@"destinationPath"]];
+        task.taskInterrupt = TaskInterruptAutoConnect;
     } else {
         [NSException raise:@"RDownloadTaskInitialization" format:@"The URL can not be nil."];
     }
@@ -85,13 +88,14 @@
 
 - (NSArray *)deleteTask:(RDownloadTask *)task {
     if ([self.taskBatch containsObject:task]) {
-        if (task.isUncountBytes) {
-            self.uncountBytesTaskNumber--;
+        if (!task.isUncountBytes) {
+            _countOfBytesExceptedToWrite -= task.totalBytesOfFile;
+            _countOfBytesWritten -= task.totalBytesWritten;
         }
-        _countOfBytesExceptedToWrite -= task.totalBytesOfFile;
-        _countOfBytesWritten -= task.totalBytesWritten;
         [self.taskBatch removeObject:task];
-        _completedNumber --;
+        if (task.isComplete) {
+            _completedNumber --;
+        }
         if (task.absoluteDestinationPath) {
             NSFileManager *fileManager = [NSFileManager defaultManager];
             NSError *error;
@@ -129,6 +133,9 @@
         if (_overallProgress < preProgress) {
             _overallProgress = preProgress;
         }
+        if (isnan(_overallProgress)) {
+            _overallProgress = 0;
+        }
     } else {
         _overallProgress = (float)self.completedNumber / self.taskBatch.count;
     }
@@ -161,7 +168,6 @@
         if (task.taskInterrupt == TaskInterruptError) {
             NSLog(@"%@ have error: %@.", task.fileName, task.errorDescription);
         }
-        
     } else {
         RDownloadTask *existTask;
         for (RDownloadTask *rdTask in self.taskBatch) {
@@ -190,6 +196,9 @@
 - (void)startAllTasks {
     for (RDownloadTask *rdTask in self.taskBatch) {
         [rdTask.sessionDownloadTask resume];
+        if (rdTask.taskInterrupt == TaskInterruptCreateTask) {
+            rdTask.taskInterrupt = TaskInterruptAutoConnect;
+        }
         [self updateIndividualProgressAndOveralProgressInMainThread:rdTask];
     }
 }
@@ -198,6 +207,9 @@
     for (RDownloadTask *rdTask in self.taskBatch) {
         if (rdTask.sessionTaskState == NSURLSessionTaskStateRunning) {//Send suspend twice will make task can not resume
             [rdTask.sessionDownloadTask suspend];
+        }
+        if (rdTask.taskInterrupt == TaskInterruptAutoConnect) {
+            rdTask.taskInterrupt = TaskInterruptCreateTask;
         }
         [self updateIndividualProgressAndOveralProgressInMainThread:rdTask];
     }
@@ -255,7 +267,8 @@
             task.error = error;
             task.isComplete = YES;
             task.isUncountBytes = NO;
-            if (self.delegate && [self.delegate respondsToSelector:@selector(didCompletedOneTask:)]) {//Call this delegate method dividually to ensure this  method will be called once.
+            task.taskInterrupt = TaskInterruptNone;
+            if (self.delegate && [self.delegate respondsToSelector:@selector(didCompletedOneTask:)]) {//Call this delegate method dividually to ensure this method will be called once.
                 [self.delegate didCompletedOneTask:task];
             }
         } else {
@@ -268,10 +281,12 @@
     }
     
     if (!task.isComplete) {//The NSURLSessionDownloadTask will be created still when offline.
+        //NSURLRequest *requet = [[NSURLRequest alloc] initWithURL:task.URL];
+        // task.sessionDownloadTask = [self.backgroundSession downloadTaskWithRequest:requet];
         task.isUncountBytes = YES;
-        self.uncountBytesTaskNumber++;
-        NSURLRequest *requet = [[NSURLRequest alloc] initWithURL:task.URL];
-        task.sessionDownloadTask = [self.backgroundSession downloadTaskWithRequest:requet];
+        if (self.networkReachable) {
+            [self DetectHostAndGetFilesize:task];
+        }
     }
     [self.taskBatch addObject:task];
     if (self.delegate && [self.delegate respondsToSelector:@selector(didTaskBatchChange:)]) {
@@ -279,6 +294,31 @@
     }
     [self updateIndividualProgressAndOveralProgressInMainThread:task];
     return task;
+}
+
+- (void)DetectHostAndGetFilesize:(RDownloadTask *)task {
+    NSMutableURLRequest *requet = [[NSMutableURLRequest alloc] initWithURL:task.URL];
+    requet.timeoutInterval = 160;
+    [requet setValue:@"" forHTTPHeaderField:@"Accept-Encoding"];
+    requet.HTTPMethod = @"HEAD";
+    //Background session won't try to initiate the connections util the remote server is reachable.We should check reachability before initiating the request.
+    NSURLSessionDataTask *headTask = [[NSURLSession sharedSession] dataTaskWithRequest:requet completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
+        dispatch_sync(dispatch_get_main_queue(), ^{
+            if (error) {
+                task.error = error;
+                [self updateIndividualProgressAndOveralProgressInMainThread:task];
+            } else {
+                self.uncountBytesTaskNumber++;
+                NSURLRequest *request = [[NSURLRequest alloc] initWithURL:task.URL];
+                task.sessionDownloadTask = [self.backgroundSession downloadTaskWithRequest:request];
+                if (task.taskInterrupt == TaskInterruptAutoConnect) {
+                    [task.sessionDownloadTask resume];
+                }
+                task.taskInterrupt = TaskInterruptNone;
+            }
+        });
+    }];
+    [headTask resume];
 }
 
 - (RDownloadTask *)findRDownloadTaskFromTaskBatch:(NSURLSessionTask *)downloadTask {
@@ -291,10 +331,13 @@
 }
 
 - (void)updateIndividualProgressAndOveralProgressInMainThread:(RDownloadTask *)task {
-    if (task.error) {
+    if (task.error && !task.isComplete) {
         if (!task.isComplete) {
             task.isComplete = YES;
             _completedNumber++;
+            if (self.delegate && [self.delegate respondsToSelector:@selector(didCompletedOneTask:)]) {//Call this delegate method dividually to ensure this method will be called once.
+                [self.delegate didCompletedOneTask:task];
+            }
         }
         task.taskInterrupt = TaskInterruptError;
     }
@@ -320,10 +363,13 @@
 }
 
 - (void)updateIndividualProgressAndOveralProgress:(RDownloadTask *)task {
-    if (task.error) {
-        if (!task.isComplete) {
-            task.isComplete = YES;
-            _completedNumber++;
+    if (task.error && !task.isComplete) {
+        task.isComplete = YES;
+        _completedNumber++;
+        if (self.delegate && [self.delegate respondsToSelector:@selector(didCompletedOneTask:)]) {//Call this delegate method dividually to ensure this method will be called once.
+            dispatch_sync(dispatch_get_main_queue(), ^{
+                [self.delegate didCompletedOneTask:task];
+            });
         }
         task.taskInterrupt = TaskInterruptError;
     }
@@ -351,7 +397,6 @@
                     [self.delegate didcompletedAllTask:self.taskBatch];
                 });
             }
-            
         }
     }
 }
@@ -359,9 +404,14 @@
 - (void)TasksOnline {
     for (int i = 0; i < self.taskBatch.count; i++) {
         RDownloadTask *task = self.taskBatch[i];
-        if (task.taskInterrupt == TaskInterruptAutoConnect) {
-            [task.sessionDownloadTask resume];
-            task.taskInterrupt = TaskInterruptNone;
+        if (task.taskInterrupt == TaskInterruptAutoConnect || task.taskInterrupt == TaskInterruptCreateTask) {
+            if (task.sessionDownloadTask) {
+                [task.sessionDownloadTask resume];
+                task.taskInterrupt = TaskInterruptNone;
+            } else {
+                [self DetectHostAndGetFilesize:task];
+            }
+            
         }
     }
 }
@@ -369,7 +419,7 @@
 - (void)TasksOffline {
     for (int i = 0; i < self.taskBatch.count; i++) {
         RDownloadTask *task = self.taskBatch[i];
-        if (task.sessionDownloadTask.state == NSURLSessionTaskStateRunning) {
+        if (task.sessionDownloadTask && task.sessionDownloadTask.state == NSURLSessionTaskStateRunning) {
             [task.sessionDownloadTask suspend];
             task.taskInterrupt = TaskInterruptAutoConnect;
         }
@@ -487,7 +537,6 @@
         task.error = error;
         task.progress = 1;
         NSLog(@"original path: %@ path: %@ error: %@", location.path, filePath, error.localizedDescription);
-        
         if (self.delegate && [self.delegate respondsToSelector:@selector(didCompletedOneTask:)]) {//Call this delegate method dividually to ensure this  method will be called once.
             dispatch_sync(dispatch_get_main_queue(), ^{
                 [self.delegate didCompletedOneTask:task];
@@ -497,7 +546,6 @@
         [self updateIndividualProgressAndOveralProgress:task];
     }
 }
-
 
 - (void)URLSessionDidFinishEventsForBackgroundURLSession:(NSURLSession *)session {
     NSLog(@"URLSessionDidFinishEventsForBackgroundURLSession");

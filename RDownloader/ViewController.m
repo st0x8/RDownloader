@@ -39,6 +39,7 @@
     //Use the keyword "URL" "fileName" "destinationPath" to create a new task. If you do not set file name, the file name will create by url.
     [self.downloader addTask:@{@"URL":@"http://z19.9553.com/game19/雨天.rar", @"destinationPath":@"test"}];
     [self.downloader addTask:@{@"URL":@"http://b.zol-img.com.cn/desk/bizhi/image/1/2880x1800/1347960622548.jpg" ,@"fileName":@"pool.jpg"}];
+    [self.downloader addTask:@{@"URL":@"http://z9553.com/game19/errortest.zip"}];//The URL is invalid.
     [self.downloader addTasks:@[@{@"URL":@"http://b.zol-img.com.cn/desk/bizhi/image/1/2880x1800/134796056845.jpg", @"fileName":@"autumn.jpg", @"destinationPath":@"test"},  @{@"URL":@"http://b.zol-img.com.cn/desk/bizhi/image/1/2880x1800/1347961131580.jpg"}, @{@"URL":@"http://z9553.com/game19/errortest.zip"}]];
 }
 
@@ -81,10 +82,12 @@
     }
     if (task.isComplete) {
         [cell.operateButton setTitle:@"Complete" forState:UIControlStateNormal];
-    } else if (task.sessionTaskState == NSURLSessionTaskStateRunning) {
-        [cell.operateButton setTitle:@"Suspend" forState:UIControlStateNormal];
-    } else if (task.sessionTaskState == NSURLSessionTaskStateSuspended) {
-        [cell.operateButton setTitle:@"Start" forState:UIControlStateNormal];
+    } else if (task.sessionDownloadTask) {
+        if (task.sessionTaskState == NSURLSessionTaskStateRunning) {
+            [cell.operateButton setTitle:@"Suspend" forState:UIControlStateNormal];
+        } else if (task.sessionTaskState == NSURLSessionTaskStateSuspended) {
+            [cell.operateButton setTitle:@"Start" forState:UIControlStateNormal];
+        }
     }
     cell.progressNumberLabel.text = [NSString stringWithFormat:@"%.2f%%",task.progress * 100];
     __weak __typeof(task) weakTask = task;

@@ -34,6 +34,12 @@ typedef NS_ENUM(char, TaskInterrupt){
      *  Be interrupted by offline, the task will auto resume when online.
      */
     TaskInterruptAutoConnect,
+    /**
+     *  @author Roy Lin
+     *
+     *  Be interrupted by offline, the task will auto create NSURLSessionDownloadTask instance when online, but will not resume.
+     */
+    TaskInterruptCreateTask
 };
 
 @interface RDownloadTask : NSObject
